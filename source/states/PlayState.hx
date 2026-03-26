@@ -3013,8 +3013,8 @@ class PlayState extends MusicBeatState
 		iconP1.x = barPos + (iconP1.width - iconP1.iconW) * .5 - iconP1.iconW * .1733333333333333;
 		iconP2.x = barPos - iconP2.width * .5 - iconP1.iconW * .3466666666666667;
 
-		iconP1.y = healthBar.y - iconP1.height * .5;
-		iconP2.y = healthBar.y - iconP2.height * .5;
+		iconP1.y = healthBar.y - iconP1.frameHeight * .5;
+		iconP2.y = healthBar.y - iconP2.frameHeight * .5;
 
 		// Eseq.p('${iconP1.width}, ${iconP2.width}');
 	}
