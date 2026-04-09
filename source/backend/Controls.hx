@@ -292,10 +292,7 @@ class Controls
 	private function get_mobileC():Bool
 	{
 		#if TOUCH_CONTROLS_ALLOWED
-		if (ClientPrefs.data.controlsAlpha >= 0.1)
-			return true;
-		else
-			return false;
+		return true;
 		#else
 		return false;
 		#end
