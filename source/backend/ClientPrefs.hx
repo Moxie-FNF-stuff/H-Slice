@@ -66,6 +66,7 @@ import states.InitState;
 	public var noteShaders:Bool = true;
 	public var cacheOnGPU:Bool = #if !switch false #else true #end; //From Stilic (I think he hates us actually)
 	public var vsync:Bool = false;
+	public var strictLoadingScreen:Bool = false;
 	public var framerate:Int = 60;
 
 	public var favSongIds:Array<String> = [];
@@ -139,7 +140,7 @@ import states.InitState;
 
 	// V-Slice Settings
 	public var vsliceFreeplay:Bool = true;
-	public var strictLoadingScreen:Bool = false;
+	public var vsliceEmbeddedSongs:Bool = true;
 	public var vsliceMobileControls:Bool = false;
 	public var vsliceFreeplayColors:Bool = true;
 	public var vsliceResults:Bool = true;

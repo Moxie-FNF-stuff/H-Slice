@@ -72,18 +72,20 @@ class WeekData {
 	{
 		weeksList = [];
 		weeksLoaded.clear();
+		var directories:Array<String>;
+		var originalLength:Int;
 		#if MODS_ALLOWED
-		var directories:Array<String> = [Paths.mods()];
-		if (true) {
+		directories = [Paths.mods()];
+		if (ClientPrefs.data.vsliceEmbeddedSongs || Mods.parseList().enabled.length == 0) {
 			directories.push(Paths.getSharedPath());
 		}
-		var originalLength:Int = directories.length;
+		originalLength = directories.length;
 
 		for (mod in Mods.parseList().enabled)
 			directories.push(Paths.mods(mod + '/'));
 		#else
-		var directories:Array<String> = [Paths.getSharedPath()];
-		var originalLength:Int = directories.length;
+		directories = [Paths.getSharedPath()];
+		originalLength = directories.length;
 		#end
 
 		var sexList:Array<String> = CoolUtil.coolTextFile(Paths.getSharedPath('weeks/weekList.txt'));

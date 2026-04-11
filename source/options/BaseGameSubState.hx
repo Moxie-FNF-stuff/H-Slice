@@ -11,8 +11,14 @@ class BaseGameSubState extends BaseOptionsMenu {
         rpcTitle = "P-Slice settings menu";
 
         var option:Option = new Option('Use New Freeplay State',
-			"If disabled, it uses Psych Engine's Freeplay State instead of the new one.",
+			"Use Psych Engine's Freeplay State instead of the new one.",
 			'vsliceFreeplay',
+			BOOL);
+		addOption(option);
+		
+		var option:Option = new Option('Load V-Slice Songs',
+			"If unchecked, Skip loading songs in assets folder.\nIt's useful to make a mod, and reduces loading time on freeplay.\nIt's automatically turned on if no mods found.",
+			'vsliceEmbeddedSongs',
 			BOOL);
 		addOption(option);
 

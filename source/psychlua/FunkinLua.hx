@@ -395,6 +395,8 @@ class FunkinLua {
 			Song.loadFromJson(poop, false, name);
 			PlayState.storyDifficulty = difficultyNum;
 			FlxG.state.persistentUpdate = false;
+			PlayState.unspawnNotes = []; // I've should be added this shit before release 0.2.4
+			PlayState.loaded = false; // I've should be added this shit before release 0.2.4
 			LoadingState.loadAndSwitchState(new PlayState());
 
 			FlxG.sound.music.pause();

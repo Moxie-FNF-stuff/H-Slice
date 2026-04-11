@@ -365,6 +365,7 @@ class PauseSubState extends MusicBeatSubstate
 						PlayState.changedDifficulty = true;
 						PlayState.chartingMode = false;
 						PlayState.unspawnNotes = [];
+						PlayState.loaded = false; // I've should be added this shit before release 0.2.4
 						return;
 					}
 				}
