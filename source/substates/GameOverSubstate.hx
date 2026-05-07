@@ -137,6 +137,7 @@ class GameOverSubstate extends MusicBeatSubstate
 				PlayState.deathCounter = 0;
 				PlayState.seenCutscene = false;
 				PlayState.chartingMode = false;
+				PlayState.loaded = false; // I've should be added this shit before release 0.2.4
 	
 				//! not yet
 				//Mods.loadTopMod();
