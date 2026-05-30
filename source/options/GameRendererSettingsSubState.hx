@@ -19,41 +19,17 @@ class GameRendererSettingsSubState extends BaseOptionsMenu
     var offTimer:FlxTimer = new FlxTimer();
 	
 	public static final codecList:Array<String> = [
-		'H.264',
-		'H.264 QSV',
-		'H.264 NVENC',
-		'H.264 AMF',
-		'H.264 VAAPI',
-		'H.265',
-		'H.265 QSV',
-		'H.265 NVENC',
-		'H.265 AMF',
-		'H.265 VAAPI',
-		'VP8',
-		'VP8 VAAPI',
-		'VP9',
-		'VP9 VAAPI',
-		'AV1',
-		'AV1 NVENC'
+		'H.264', 'H.264 QSV', 'H.264 NVENC', 'H.264 AMF',
+		'H.265', 'H.265 QSV', 'H.265 NVENC', 'H.265 AMF',
+		'VP8', 'VP9',
+		'AV1', 'AV1 QSV', 'AV1 NVENC', 'AV1 AMF'
 	];
 	
     public static final codecMap:Map<String, String> = [
-        'H.264' => 'libx264',
-        'H.264 QSV' => 'h264_qsv',
-        'H.264 NVENC' => 'h264_nvenc',
-        'H.264 AMF' => 'h264_amf',
-        'H.264 VAAPI' => 'h264_vaapi',
-        'H.265' => 'libx265',
-        'H.265 QSV' => 'hevc_qsv',
-        'H.265 NVENC' => 'hevc_nvenc',
-        'H.265 AMF' => 'hevc_amf',
-        'H.265 VAAPI' => 'hevc_vaapi',
-        'VP8' => 'libvpx',
-        'VP8 VAAPI' => 'libvpx_vaapi',
-        'VP9' => 'libvp9',
-        'VP9 VAAPI' => 'libvp9_vaapi',
-        'AV1' => 'libsvtav1',
-        'AV1 NVENC' => 'av1_nvenc'
+        'H.264' => 'libx264', 'H.264 QSV' => 'h264_qsv', 'H.264 NVENC' => 'h264_nvenc', 'H.264 AMF' => 'h264_amf',
+        'H.265' => 'libx265', 'H.265 QSV' => 'hevc_qsv', 'H.265 NVENC' => 'hevc_nvenc', 'H.265 AMF' => 'hevc_amf',
+        'VP8' => 'libvpx', 'VP9' => 'libvp9',
+        'AV1' => 'libsvtav1', 'AV1 QSV' => 'av1_qsv', 'AV1 NVENC' => 'av1_nvenc', 'AV1 AMF' => 'av1_amf'
     ];
 
 	public function new()
@@ -147,7 +123,7 @@ class GameRendererSettingsSubState extends BaseOptionsMenu
 		var option:Option = new Option('Video Quality',
 			"The quality set here is a constant.",
 			'constantQuality',
-			FLOAT);
+			INT);
 		addOption(option);
 
 		option.minValue = 0;
@@ -155,7 +131,6 @@ class GameRendererSettingsSubState extends BaseOptionsMenu
 		option.scrollSpeed = 20;
 		option.decimals = 1;
 		option.displayFormat = '%v';
-		bitOption = option;
 
         var option:Option = new Option('Unlock Framerate',
 			"If checked, the framerate will be uncapped while rendering a song.\nThis does not affect the video framerate!",
@@ -170,7 +145,7 @@ class GameRendererSettingsSubState extends BaseOptionsMenu
 		addOption(option);
 
         var option:Option = new Option('Preview Mode',
-			"If checked, the game will skip redering.\nIf ffmpeg is not found, this is forced on.\nIt's for a function for debug too.",
+			"If checked, the game will skip rendering.\nIf ffmpeg is not found, this is forced on.\nIt's for a function for debug too.",
 			'previewRender',
 			BOOL);
 		addOption(option);
@@ -302,6 +277,11 @@ class GameRendererSettingsSubState extends BaseOptionsMenu
 			o.setValue(false);
 			reloadCheckboxes();
 		});
+	}
+
+	override function destroy() {
+		if (offTimer.active) offTimer.cancel();
+		super.destroy();
 	}
 
 	override function changeSelection(delta:Float, usePrecision:Bool = false) {

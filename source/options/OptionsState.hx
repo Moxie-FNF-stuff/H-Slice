@@ -200,7 +200,7 @@ class OptionsState extends MusicBeatState
 
 		if (FlxG.mouse.wheel != 0)
 		{
-			changeSelection(FlxG.mouse.wheel, true, true);
+			changeSelection(-FlxG.mouse.wheel, true, true);
 		}
 
 		// var lerpVal:Float = Math.max(0, Math.min(1, elapsed * 7.5));

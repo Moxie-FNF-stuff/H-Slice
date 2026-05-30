@@ -238,7 +238,8 @@ class ClientPrefs {
 		'volume_down'	=> [NUMPADMINUS, MINUS],
 		
 		'debug_1'		=> [SEVEN],
-		'debug_2'		=> [EIGHT]
+		'debug_2'		=> [EIGHT],
+		'fast_playback' => [SPACE]
 	];
 	public static var gamepadBinds:Map<String, Array<FlxGamepadInputID>> = [
 		'note_up'		=> [DPAD_UP, Y],
@@ -254,13 +255,14 @@ class ClientPrefs {
 		'favorite'		=> [],
 		'bar_left'		=> [],
 		'bar_right'		=> [],
-		'char_select'		=> [],
+		'char_select'	=> [],
 
 		'accept'		=> [A, START],
 		'back'			=> [B],
 		'pause'			=> [START],
 		'screenshot'    => [],
-		'reset'			=> [BACK]
+		'reset'			=> [BACK],
+		'fast_playback' => []
 	];
 	public static var mobileBinds:Map<String, Array<MobileInputID>> = [
 		'note_up'		=> [HITBOX_UP],
@@ -281,7 +283,8 @@ class ClientPrefs {
 		'back'			=> [B],
 		'pause'			=> [P],
 		'screenshot'    => [NONE],
-		'reset'			=> [NONE]
+		'reset'			=> [NONE],
+		'fast_playback' => [NONE]
 	];
 	public static var defaultMobileBinds:Map<String, Array<MobileInputID>> = null;
 	public static var defaultKeys:Map<String, Array<FlxKey>> = null;
