@@ -3762,6 +3762,7 @@ class PlayState extends MusicBeatState
 
 	public function openChartEditor()
 	{
+		#if !DISABLE_CHART_EDITOR
 		canResync = false;
 		FlxG.camera.followLerp = 0;
 		persistentUpdate = false;
@@ -3780,6 +3781,7 @@ class PlayState extends MusicBeatState
 
 		MusicBeatState.switchState(new ChartingState(!chartingMode));
 		chartingMode = true;
+		#end
 	}
 
 	function openCharacterEditor()
@@ -4412,11 +4414,13 @@ class PlayState extends MusicBeatState
 
 			playbackRate = 1;
 
+			#if !DISABLE_CHART_EDITOR
 			if (chartingMode)
 			{
 				openChartEditor();
 				return false;
 			}
+			#end
 
 			if (isStoryMode)
 			{

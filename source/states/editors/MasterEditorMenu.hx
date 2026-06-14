@@ -13,7 +13,9 @@ import objects.Character;
 class MasterEditorMenu extends MusicBeatState
 {
 	var options:Array<String> = [
-		'Chart Editor', 
+		#if !DISABLE_CHART_EDITOR
+		'Chart Editor',
+		#end
 		'Character Editor', 
 		'Stage Editor', 
 		'Week Editor', 
