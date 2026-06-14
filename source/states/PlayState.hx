@@ -421,67 +421,6 @@ class PlayState extends MusicBeatState
 	var sortingWay = 0;
 	var commaImg = false;
 
-	var freeBotplayTxt:Array<String> = [
-		"BOTPRAY",
-		"Skill issue mode",
-		"Ready or die",
-		"Bambi black midis be like:",
-		"You fish",
-		"Pumpkin",
-		"I hate garbage collector",
-		"Someone calling 911",
-		"Heaven or hell",
-		"I'll give u the gift called empty",
-		"Imagine 1 billion notes fnf chart",
-		"Imagine 1 trillion notes fnf chart",
-		"Run away or someone comes",
-		"Disguised face",
-		"Is rainbow eyesore a drug?",
-		"Any number divided by 0 equals 42",
-		"It's just a text",
-		"Wait, who are you",
-		"Hello, visitor!",
-		"When botplay lags:",
-		"Amogus",
-		"Is it impossible?",
-		"Testing... just testing...",
-		"Gf neck is getting bonk",
-		"It's a benchmark",
-		"B0TPL4Y",
-		"8 800 555 3535",
-		"Never gonna give you up",
-		"Spamming spamming spamming",
-		"Beware memory leaks",
-		"When would it can multi-threaded processing", // sadly opengl only supports single-threaded rendering... i'll wait haxeflixel can use vulkan
-		"Help me, I have programming skill issue",
-		"Demon is inside bot",
-		"Don't worry, You can beat this",
-		"It's not overcharted, You're just bad",
-		":)",
-		">:(",
-		"+++++++++[>++++++++<-]>------.+++++++++++++.+++++.----.----.-----------.<+++++[>+++++<-]>-.",
-		"TXkgZXZlcnkgdGVjaG5pcXVlIGhhdmUgc3RvbGVuIGJ5IG90aGVyIHByb2dyYW1tZXJz",
-		"...---...",
-		"Dark, Darker, Yet Darker",
-		"Mesmerizing",
-		"Your PC is screaming",
-		"NOTPLAY",
-		"Coming 2027",
-		"Mango",
-		"127.0.0.1:6000",
-		"Break Infinity!",
-		"Break Eternity!",
-		"Break Unity/Reality!",
-		"Recursion is Power",
-		"YOUR TAKING TOO LONG",
-		"YOUR LONG",
-		"YOUR DONKEY KONG",
-		"Dave and baldi are same game btw",
-		"You felt deja vu",
-		"No way...",
-		"Amen break core",
-	];
-
 	var rickRolled:Bool = false;
 	final rickRollTxt:Array<String> = [
 		"Never gonna give you up",
@@ -848,7 +787,7 @@ class PlayState extends MusicBeatState
 		uiGroup.add(botplayTxt);
 
 		if (ClientPrefs.data.randomText && FlxG.random.bool(ClientPrefs.data.randomChance * 100) && !ffmpegMode){
-			botplayTxt.text = FlxG.random.getObject(freeBotplayTxt);
+			botplayTxt.text = FlxG.random.getObject(getRandomFreeplayText());
 		}
 
 		uiGroup.cameras = [camHUD];
@@ -1036,7 +975,7 @@ class PlayState extends MusicBeatState
 			}
 			keepNotes = true;
 
-			if (ClientPrefs.data.vsync) FlxG.stage.application.window.vsync = false;
+			FlxG.stage.application.window.vsync = false;
 
 			video.init();
 			video.setup();
@@ -1050,6 +989,18 @@ class PlayState extends MusicBeatState
 			MemoryUtil.disable();
 		}
 	}
+
+	function getRandomFreeplayText() {
+		var array:Array<String>;
+		#if (MODS_ALLOWED && !LEGACY_PSYCH)
+		array = Mods.mergeAllTextsNamed('data/botplay.txt');
+		#else
+		array = lime.utils.Assets.getText(Paths.txt('botplay')).split('\n');
+		#end
+		
+		return array;
+	}
+	
 
 	function set_songSpeed(value:Float):Float
 	{
@@ -1615,13 +1566,13 @@ class PlayState extends MusicBeatState
 				updateScoreStr += ' (${CoolUtil.floorDecimal(ratingPercent * 100, 3)} %) - ${Language.getPhrase(ratingFC)}';
 		}
 		
-		if (practiceMode) hpShowStr = '${numberDelimit ? formatD(targetHealth) : Std.string(targetHealth)} %';
+		if (practiceMode) hpShowStr = '${formatD(targetHealth)} %';
 		else {
 			hpPrecision = 4 - Std.string(Math.floor(targetHealth)).length;
 			if (hpPrecision > 0) {
-				hpShowStr = '${numberDelimit ? numFormat(targetHealth, hpPrecision, true) : Std.string(targetHealth)} ${targetHealth >= 0.001 ? '%' : ''}';
+				hpShowStr = '${numFormat(targetHealth, hpPrecision, true)}${targetHealth >= 0.001 ? ' %' : ''}';
 			} else {
-				hpShowStr = '${numberDelimit ? formatD(targetHealth, hpPrecision, true) : Std.string(targetHealth)} %';
+				hpShowStr = '${formatD(targetHealth, hpPrecision, true)} %';
 			}
 		}
 
@@ -2380,7 +2331,7 @@ class PlayState extends MusicBeatState
 	var globalElapsed:Float = 0;
 	var shownTime:Float = 0;
 	var shownRealTime:Float = 0;
-	var canBeHit:Bool = false;
+	public var canBeHit:Bool = false;
 	var tooLate:Bool = false;
 	var noteSpawnJudge:Bool = false;
 	var safeTime:Float = 0;
@@ -2423,6 +2374,13 @@ class PlayState extends MusicBeatState
 	var columnIndex:Int = 0;
 	var columns:Int = 0;
 
+	/**
+	 * this array has 10 elements, and it can't resize  
+	 * before-main: 0, spawn: 1, process: 2, finalize: 3, after-main: 4, finish-update: 5  
+	 */
+	var detailDelta:Vector<Float> = new Vector(6*2);
+	var deltaIndex = 0;
+
 	// NPS
 	var npsTime = 0;
 	var npsMod = false;
@@ -2452,14 +2410,32 @@ class PlayState extends MusicBeatState
 	var refBpm:Float = 0;
 	var tweenBpm:Float = 1;
 
+	inline function getProgressionTime() {
+		if (debugInfos && nanoPosition) {
+			detailDelta[deltaIndex++] = CoolUtil.getNanoTime();
+		}
+	}
+	
+	inline function calcProgressionTime() {
+		if (debugInfos && nanoPosition) {
+			detailDelta[deltaIndex] = detailDelta[deltaIndex-1] - detailDelta[0];
+			for (i in 1...deltaIndex) {
+				detailDelta[i + deltaIndex] = detailDelta[i] - detailDelta[i-1];
+			}
+		}
+	}
+
 	override public function update(elapsed:Float)
 	{
+		deltaIndex = 0;
+		getProgressionTime();
+
 		// Pre Render Image
 		if (preshot) renderFrame();
 
 		if (!ffmpegMode && cpuControlled) {
-			if (FlxG.keys.justPressed.SPACE) playbackRate = skipRate;
-			if (FlxG.keys.released.SPACE) playbackRate = normalRate;
+			if (controls.justPressed('fast_playback')) playbackRate = skipRate;
+			if (controls.justReleased('fast_playback')) playbackRate = normalRate;
 		}
 		
 		opHit = bfHit = showAgain = false; canAnim.fill(true);
@@ -2623,14 +2599,14 @@ class PlayState extends MusicBeatState
 			checkSync();
 
 		/* --- main process --- */
-		if (!processFirst) {
-			noteSpawn();
-			noteUpdate();
+		if (processFirst) {
+			getProgressionTime(); noteUpdate();
+			getProgressionTime(); noteSpawn();
 		} else {
-			noteUpdate();
-			noteSpawn();
+			getProgressionTime(); noteSpawn();
+			getProgressionTime(); noteUpdate();
 		}
-		noteFinalize();
+		getProgressionTime(); noteFinalize(); getProgressionTime();
 		/* --- main process --- */
 
 		if (sortingWay >= 3) noteSort();
@@ -2898,7 +2874,12 @@ class PlayState extends MusicBeatState
 								info = 'No Popups';
 							}
 						case 3:
-							info = 'Processed Real Notes: $processedReal / ${numFormat(processedRealElapsed * 1000, 3)} ms';
+							info = '${numFormat(detailDelta[6] * 1000, 3)} / '
+								 + '${numFormat(detailDelta[7] * 1000, 3)} / '
+								 + '${numFormat(detailDelta[8] * 1000, 3)} / '
+								 + '${numFormat(detailDelta[9] * 1000, 3)} / '
+								 + '${numFormat(detailDelta[10] * 1000, 3)} / '
+								 + '${numFormat(detailDelta[11] * 1000, 3)}';
 						case 4:
 							info = '${skipAnim[0]} / ${skipAnim[1]} / ${skipAnim[2]}\n${loopVector[0].strumTime} / ${loopVector[1].strumTime}';
 						case 5:
@@ -2959,6 +2940,8 @@ class PlayState extends MusicBeatState
 		if (!preshot) renderFrame();
 		
 		++frameCount;
+		getProgressionTime();
+		calcProgressionTime();
 	}
 
 	function renderFrame() {
@@ -3032,12 +3015,12 @@ class PlayState extends MusicBeatState
 
 	var castHold = false;
 	var castMust = false;
-	var fixedPosition:Float = 0;
 	var iDist:Array<Float> = [];
 	var lDist:Array<Float> = [];
 	var dist:Array<Float> = [];
 	var availNoteData:Int = 0;
 
+	public static var fixedPosition:Float = 0;
 	var susEnds:Int = 0;
 
 	inline function initSpawnInfo(casted:CastNote) {
@@ -3147,13 +3130,13 @@ class PlayState extends MusicBeatState
 		return false;
 	}
 	
-	// Do not declare inside loops. This causes memory leaks.
+	// Do not declare inside loops, or it'll causes memory leaks.
 	var prevStrumTime:Float;
 	var bulkSkipCount:Float;
 	var noteInterval:Float;
 	function spamSpawn() {
+		fixedPosition = Conductor.songPosition - ClientPrefs.data.noteOffset;
 		for (spam in spamNotes) {
-			fixedPosition = Conductor.songPosition - ClientPrefs.data.noteOffset;
 			limitCount = notes.countLiving();
 
 			initSpawnInfo(spam.seedNote);
@@ -3366,11 +3349,6 @@ class PlayState extends MusicBeatState
 	{
 		if (generatedMusic)
 		{
-			if (debugInfos) {
-				processedReal = 0;
-				processedRealTimer = nanoPosition ? CoolUtil.getNanoTime() : Timer.stamp();
-			}
-
 			checkEventNote();
 
 			if (!inCutscene)
@@ -3385,7 +3363,7 @@ class PlayState extends MusicBeatState
 					}
 					if (startedCountdown)
 					{
-						notes.forEachAlive(daNote -> {
+						notes.forEachShown(daNote -> {
 							++processedReal;
 
 							canBeHit = Conductor.songPosition - daNote.strumTime > 0;
@@ -5526,7 +5504,7 @@ class PlayState extends MusicBeatState
 			}
 			if (!previewRender) video.destroy();
 
-			FlxG.stage.application.window.vsync = ClientPrefs.data.vsync;
+			if (ClientPrefs.data.vsync) FlxG.stage.application.window.vsync = true;
 			ClientPrefs.data.noteOffset = backupOffset;
 
 			if (video.wentPreview != null) ClientPrefs.data.previewRender = false;

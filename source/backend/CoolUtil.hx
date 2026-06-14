@@ -218,11 +218,7 @@ class CoolUtil
 		str = null; len = null; abs = null;
 		result = (number < 0 ? "-" : "") + result;
 
-		if (mode && ClientPrefs.data.numberFormat) {
-			result = customNumberDelimiter(result);
-		}
-
-		return result;
+		return mode && ClientPrefs.data.numberFormat ? customNumberDelimiter(result) : result;
 	}
 
 	/**
@@ -391,7 +387,7 @@ class CoolUtil
 		while (amount > 0)
 		{
 			if (string.length > 0 && comma.length <= 0)
-				comma = (englishStyle ? "," : ".");
+				comma = ClientPrefs.data.numberFormat ? (englishStyle ? "," : ".") : "";
 
 			zeroes = "";
 			helper = amount - Math.ffloor(amount / 1000) * 1000;

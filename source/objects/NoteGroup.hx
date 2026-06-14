@@ -64,6 +64,24 @@ class NoteGroup extends FlxTypedGroup<Note>
         } else 0;
     }
 
+	/**
+	 * Applies a function to shown members.
+	 * but it's optimized for fnf.
+     * It only works for PlayState.
+	 * @param   func     A function that modifies one element at a time.
+	 */
+    public function forEachShown(f:Note->Void)
+    {
+        if (!PlayState.inPlayState) return;
+		for (note in members)
+		{
+			if (note.visible || PlayState.fixedPosition > note.strumTime)
+			{
+				f(note);
+			}
+		}
+    }
+
     public function debugInfo():Array<Float> {
         living = countLiving();
         return [living, length, living * 100.0 / Math.max(length, 1), length];
